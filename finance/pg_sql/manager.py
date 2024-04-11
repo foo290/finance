@@ -2,7 +2,7 @@ import psycopg2
 from psycopg2.extras import execute_values
 from psycopg2.pool import SimpleConnectionPool
 
-from finance.pg_sql.context import ConnectionCtxManager
+from finance.pg_sql.context import PoolCtxManager
 from finance.pg_sql.connection_pooling import pool as pg_pool
 from finance.configs import DBTableNames
 
@@ -21,13 +21,13 @@ class DBManager:
         self._connection_pool.putconn(conn)
 
     def execute_query(self, query: str):
-        with ConnectionCtxManager(self._connection_pool) as cursor:
+        with PoolCtxManager(self._connection_pool) as cursor:
             cursor.execute(query)
 
     def get(self, table_name: str, limit: int = 100, offset: int = 0):
         query = f"SELECT * FROM {table_name} LIMIT {limit} OFFSET {offset}"
 
-        with ConnectionCtxManager(self._connection_pool) as cursor:
+        with PoolCtxManager(self._connection_pool) as cursor:
             cursor.execute(query)
             return cursor.fetchall()
 
@@ -38,7 +38,7 @@ class DBManager:
         if condition:
             query += f" WHERE {condition}"  # sql injection?
 
-        with ConnectionCtxManager(self._connection_pool) as cursor:
+        with PoolCtxManager(self._connection_pool) as cursor:
             cursor.execute(query, list(data.values()))
 
     def insert(self, table_name: str, data: dict):
@@ -48,7 +48,7 @@ class DBManager:
         query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
         values = tuple(data.values())
 
-        with ConnectionCtxManager(self._connection_pool) as cursor:
+        with PoolCtxManager(self._connection_pool) as cursor:
             cursor.execute(query, values)
 
     def insert_multi(self, table_name: str, data: list):
@@ -61,7 +61,7 @@ class DBManager:
 
         values = [[row[column] for column in columns] for row in data]
 
-        with ConnectionCtxManager(self._connection_pool) as cursor:
+        with PoolCtxManager(self._connection_pool) as cursor:
             execute_values(cursor, query, values)
             print("Data inserted successfully.")
 
