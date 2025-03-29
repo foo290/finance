@@ -8,7 +8,7 @@ def main(payment_data_file_name: str):
 
 
 if __name__ == '__main__':
-    payment_data_file = 'data_files/march2024.csv'
+    payment_data_file = '/home/ns290/downloads/AC-102024 - octAcct Statement_XX8550_24022025 (1).csv'
     main(payment_data_file)
 
 

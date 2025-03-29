@@ -17,7 +17,7 @@ class DBConfig:
 
 @dataclass
 class DBTableNames:
-    payment_transactions = 'testststs'
+    payment_transactions = 'payment_transactions'
 
 
 @dataclass
@@ -42,9 +42,9 @@ class DBTableQueries:
 
 
 config = DBConfig(
-    db_name='postgres',
+    db_name='finance',
     db_user='postgres',
-    db_password='admin123',
+    db_password='postgres',
     db_host='localhost',
     db_port='5432'
 )

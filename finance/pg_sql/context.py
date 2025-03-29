@@ -5,7 +5,7 @@ from psycopg2 import pool as psycopg_connection_pool
 class PoolCtxManager:
     def __init__(self, pool: psycopg_connection_pool):
         self.pool: pool = pool
-        self.connection: psycopg2.connection = self.pool.getconn()
+        self.connection = self.pool.getconn()
 
     def __enter__(self):
         self.cursor = self.connection.cursor()
@@ -26,7 +26,7 @@ class PoolCtxManager:
 
 
 class ConnectionCtxManager:
-    def __init__(self, connection: psycopg2.connection):
+    def __init__(self, connection):
         self.connection = connection
 
     def __enter__(self):
