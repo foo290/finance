@@ -6,6 +6,9 @@ __pycache__/
 data_files/*
 .idea
 
+data/
+transformed/
+
 # C extensions
 *.so
 
