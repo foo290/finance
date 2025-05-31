@@ -4,57 +4,58 @@ from pathlib import Path
 import shutil
 
 
+join_path = lambda *args: os.path.join(*args)
+
 ROOT_DIR = Path(__file__).parent
 
-transform_notebook_path = ROOT_DIR / 'finance' / 'pipelines' / 'transform.ipynb'
-migrate_notebook_path = ROOT_DIR / 'finance' / 'pipelines' / 'migrate_data.ipynb'
-# rename_notebook_path = ROOT_DIR / 'finance' / 'pipelines' / 'rename_file.ipynb'
+transform_notebook_path = join_path(ROOT_DIR, 'finance', 'pipelines', 'transform.ipynb')
+migrate_notebook_path = join_path(ROOT_DIR, 'finance', 'pipelines', 'migrate_data.ipynb')
 
-data_file_path = '/Users/nitinsharma/playground/finance/data/'
-transformed_file_path = '/Users/nitinsharma/playground/finance/transformed/'
+source_file_path = join_path(ROOT_DIR, 'data')
+destination_file_path = join_path(ROOT_DIR, 'transformed')
 
-os.makedirs(data_file_path, exist_ok=True)
-os.makedirs(transformed_file_path, exist_ok=True)
+source_processed_file_path = join_path(ROOT_DIR, 'data', 'processed')
+destination_processed_file_path = join_path(ROOT_DIR, 'transformed', 'processed')
 
-for file in os.listdir(data_file_path):
+os.makedirs(source_file_path, exist_ok=True)
+os.makedirs(destination_file_path, exist_ok=True)
+
+for file in os.listdir(source_file_path):
     if file.endswith('.xls'):
-        file_path = os.path.join(data_file_path, file)
+        file_path = os.path.join(source_file_path, file)
         pm.execute_notebook(
             transform_notebook_path,
             transform_notebook_path,
             parameters={
                 'source_file_path': file_path,
-                'destination_file_path': '/Users/nitinsharma/playground/finance/transformed/'
+                'destination_file_path': destination_file_path
             }
         )
 
-processed_file_path = '/Users/nitinsharma/playground/finance/data/processed/'
-os.makedirs(processed_file_path, exist_ok=True)
-for file in os.listdir(data_file_path):
+os.makedirs(source_processed_file_path, exist_ok=True)
+os.makedirs(destination_processed_file_path, exist_ok=True)
+for file in os.listdir(source_file_path):
     if file.endswith('.xls'):
-        file_path = os.path.join(data_file_path, file)
-        shutil.move(file_path, processed_file_path)
+        file_path = os.path.join(source_file_path, file)
+        shutil.move(file_path, source_processed_file_path)
 
 
 print("Starting Migration")
 
-for file in os.listdir(transformed_file_path):
-    if file.endswith('.csv'):
-        file_path = os.path.join(transformed_file_path, file)
-        pm.execute_notebook(
-            migrate_notebook_path,
-            migrate_notebook_path,
-            parameters={
-                'file_path': file_path,
-            }
-        )
+pm.execute_notebook(
+    migrate_notebook_path,
+    migrate_notebook_path,
+    parameters={
+        'transformed_files_path': destination_file_path,
+        "table_name": "transactions"
+    }
+)
 
 
-processed_transformed_file_path = '/Users/nitinsharma/playground/finance/transformed/processed/'
-os.makedirs(processed_transformed_file_path, exist_ok=True)
-for file in os.listdir(transformed_file_path):
+os.makedirs(destination_processed_file_path, exist_ok=True)
+for file in os.listdir(destination_file_path):
     if file.endswith('.csv'):
-        file_path = os.path.join(transformed_file_path, file)
-        shutil.move(file_path, processed_transformed_file_path)
+        file_path = os.path.join(destination_file_path, file)
+        shutil.move(file_path, destination_processed_file_path)
 
 print("Migration completed")
