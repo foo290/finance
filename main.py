@@ -56,6 +56,9 @@ os.makedirs(destination_processed_file_path, exist_ok=True)
 for file in os.listdir(destination_file_path):
     if file.endswith('.csv'):
         file_path = os.path.join(destination_file_path, file)
-        shutil.move(file_path, destination_processed_file_path)
+        try:
+            shutil.move(file_path, destination_processed_file_path)
+        except Exception as e:
+            print(f"Error moving file {file_path}: {e}")
 
 print("Migration completed")
